@@ -30,15 +30,16 @@ jobs:
       shell: pwsh
       
     - name: Check if release already exists
-      if: startsWith(github.ref, 'refs/tags/')
       run: |
+        $ErrorActionPreference = 'Continue'
         $tag = "${{ github.ref_name }}"
-        $response = gh release view $tag 2>&1
+        gh release view $tag 2>$null
         if ($LASTEXITCODE -eq 0) {
           Write-Error "Release $tag already exists! Please use a new version."
           exit 1
         }
         Write-Host "✓ Release $tag does not exist, proceeding..."
+        exit 0
       shell: pwsh
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +60,6 @@ jobs:
         path: ./publish/RainmeterLayoutManager.exe
         
     - name: Create GitHub Release
-      if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
         files: ./publish/RainmeterLayoutManager.exe
