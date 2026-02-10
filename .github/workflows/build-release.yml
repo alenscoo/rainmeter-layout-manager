@@ -19,14 +19,39 @@ jobs:
       with:
         dotnet-version: '10.0.x'
         
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        if ("${{ github.ref }}" -match "refs/tags/v(.+)") {
+          $version = $matches[1]
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+        } else {
+          echo "version=0.0.0-dev" >> $env:GITHUB_OUTPUT
+        }
+      shell: pwsh
+      
+    - name: Check if release already exists
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        $tag = "${{ github.ref_name }}"
+        $response = gh release view $tag 2>&1
+        if ($LASTEXITCODE -eq 0) {
+          Write-Error "Release $tag already exists! Please use a new version."
+          exit 1
+        }
+        Write-Host "✓ Release $tag does not exist, proceeding..."
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
     - name: Restore dependencies
       run: dotnet restore
       
     - name: Build Release
-      run: dotnet build -c Release --no-restore
+      run: dotnet build -c Release --no-restore -p:Version=${{ steps.get_version.outputs.version }}
       
     - name: Publish Self-Contained Executable
-      run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+      run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:Version=${{ steps.get_version.outputs.version }} -o ./publish
       
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
