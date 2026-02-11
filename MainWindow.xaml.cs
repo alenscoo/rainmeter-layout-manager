@@ -83,12 +83,28 @@ namespace RainmeterLayoutManager
         }
 
 
+        private static System.Drawing.Icon GetApplicationIcon()
+        {
+            try
+            {
+                string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                // Extract icon from the executable
+                var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
+                return icon ?? System.Drawing.SystemIcons.Application;
+            }
+            catch
+            {
+                // Fallback to system icon if extraction fails
+                return System.Drawing.SystemIcons.Application;
+            }
+        }
+
         private void InitializeSystemTray()
         {
             // assign new instance if notifyIcon is null
             notifyIcon ??= new System.Windows.Forms.NotifyIcon
             {
-                Icon = System.Drawing.SystemIcons.Application,
+                Icon = GetApplicationIcon(),
                 Visible = true,
                 Text = "Rainmeter Layout Manager"
             };
@@ -144,6 +160,18 @@ namespace RainmeterLayoutManager
             {
                 FingerprintText.Text = fingerprint;
             });
+        }
+
+        private void RefreshFingerprint_Click(object sender, RoutedEventArgs e)
+        {
+            string fingerprintBefore = FingerprintText.Text;
+            FingerprintText.Text = "Loading...";
+            UpdateFingerprintDisplay();
+            string fingerprintAfter = FingerprintText.Text;
+            if (fingerprintBefore != fingerprintAfter)
+            {
+                autoSwitcherService.CheckAndSwitch();
+            }
         }
 
         private void AddLayoutBinding_Click(object sender, RoutedEventArgs e)
@@ -253,18 +281,12 @@ namespace RainmeterLayoutManager
         }
     }
 
-    public class LayoutMappingViewModel : INotifyPropertyChanged
+    public class LayoutMappingViewModel(string fingerprint, string layoutName) : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        private string layoutName;
+        private string layoutName = layoutName;
 
-        public LayoutMappingViewModel(string fingerprint, string layoutName)
-        {
-            this.Fingerprint = fingerprint;
-            this.layoutName = layoutName;
-        }
-
-        public string Fingerprint { get; set; }
+        public string Fingerprint { get; set; } = fingerprint;
         public string LayoutName
         {
             get => layoutName;

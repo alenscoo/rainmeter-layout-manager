@@ -20,14 +20,26 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Current Display Fingerprint" FontWeight="SemiBold"/>
-                <TextBlock x:Name="FingerprintText" Text="Loading..." Foreground="Gray" TextWrapping="Wrap" Margin="0,5,0,0" FontSize="11"/>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="Current Display Fingerprint" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="FingerprintText" Text="Loading..." Foreground="Gray" TextWrapping="Wrap" Margin="0,5,0,0" FontSize="11"/>
+                </StackPanel>
+                <Button x:Name="RefreshFingerprintButton" 
+                        Click="RefreshFingerprint_Click"
+                        ToolTip="Refresh display fingerprint"
+                        Width="28" Height="28" 
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Top"
+                        Background="Transparent">
+                    <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="14"/>
+                </Button>
             </StackPanel>
 
-            <CheckBox x:Name="StartWithWindowsCheckBox" Grid.Column="1" Content="Start with Windows" 
+            <CheckBox x:Name="StartWithWindowsCheckBox" Grid.Column="2" Content="Start with Windows" 
                       VerticalAlignment="Center" HorizontalAlignment="Right"
                       Click="StartWithWindowsCheckBox_Click" IsChecked="False"/>
         </Grid>

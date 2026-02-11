@@ -1,3 +1,10 @@
 <Solution>
-  <Project Path="RainmeterLayoutManager.csproj" Id="c09282a4-0e4a-4938-b509-6de3389f15ab" />
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="RainmeterLayoutManager.csproj" Id="c09282a4-0e4a-4938-b509-6de3389f15ab">
+    <BuildType Solution="Debug|Any CPU" Project="Release" />
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
 </Solution>
