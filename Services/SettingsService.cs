@@ -205,6 +205,8 @@ namespace RainmeterLayoutManager.Services
             var fingerprint = string.Join("|", screens.Select(s =>
                 $"{s.Bounds.Width}x{s.Bounds.Height}@{s.Bounds.X},{s.Bounds.Y}"));
 
+            System.Diagnostics.Debug.WriteLine($"Calculated Fingerprint: {fingerprint}");
+
             return fingerprint;
         }
 

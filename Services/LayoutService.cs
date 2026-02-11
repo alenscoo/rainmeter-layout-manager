@@ -58,21 +58,29 @@ namespace RainmeterLayoutManager.Services
                 return [];
             }
 
+
             var parser = new FileIniDataParser();
             IniData data = parser.ReadFile(iniPath);
 
-            string skinPath = data.Sections["Rainmeter"]["SkinPath"];
+            // Get SkinPath from the INI - if it doesn't exist, we can't locate the skins
+            string? skinPath = data.Sections["Rainmeter"]?["SkinPath"];
+            if (string.IsNullOrEmpty(skinPath))
+            {
+                return [];
+            }
 
-            // Get all sections except "Rainmeter"
+            // Get all sections except "[Rainmeter]"
             var allSkinSections = data.Sections
                 .Select(section => section.SectionName)
                 .Where(name => name != "Rainmeter")
                 .ToList();
 
+            // Get all active skins (Active = 1 in the Rainmeter.ini)
             var activeSkins = allSkinSections
                 .Where(section => data.Sections[section].ContainsKey("Active") && data.Sections[section]["Active"] == "1")
                 .ToList();
 
+            // Map all active skins to their file paths
             var filesInDir = activeSkins
                 .Select(section => new
                 {
@@ -103,6 +111,7 @@ namespace RainmeterLayoutManager.Services
         /// </summary>
         public static void SetScale(string configName, string iniFilePath, double scaleValue)
         {
+            Debug.WriteLine($"Setting scale to {scaleValue} in {iniFilePath}");
             // 1. Write the variable
             RainmeterCLI.OptionAndVariableBangs.WriteKeyValue(iniFilePath, "Variables", "Scale", scaleValue.ToString());
 
@@ -180,15 +189,16 @@ namespace RainmeterLayoutManager.Services
                 var variables = skinEntry.Value;
 
                 // Find the INI files for this skin
-                if (skins.ContainsKey(skinName) && skins[skinName].Length > 0)
+                if (skins.TryGetValue(skinName, out string[]? skinIniFiles) && skinIniFiles.Length > 0)
                 {
                     // Apply variables to each INI file in this skin
-                    foreach (var iniFile in skins[skinName])
+                    foreach (var iniFile in skinIniFiles)
                     {
                         foreach (var variable in variables)
                         {
                             try
                             {
+                                Debug.WriteLine($"Setting variable {variable.Key} to {variable.Value} in {skinName} ({iniFile})");
                                 SetSkinVariable(iniFile, skinName, variable.Key, variable.Value);
                             }
                             catch (Exception ex)
@@ -199,6 +209,7 @@ namespace RainmeterLayoutManager.Services
                     }
                 }
             }
+
         }
     }
 }

@@ -34,7 +34,8 @@
                         Width="28" Height="28" 
                         Margin="10,0,0,0"
                         VerticalAlignment="Top"
-                        Background="Transparent">
+                        Background="Transparent" 
+                        BorderThickness="0">
                     <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="14"/>
                 </Button>
             </StackPanel>

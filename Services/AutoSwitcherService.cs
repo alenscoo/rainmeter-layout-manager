@@ -49,15 +49,12 @@ namespace RainmeterLayoutManager.Services
                 string? targetLayout = settingsService.GetLayoutForFingerprint(currentFingerprint);
                 FingerprintDetected?.Invoke(currentFingerprint);
 
-                Debug.WriteLine($"Fingerprint: {currentFingerprint}");
-                Debug.WriteLine($"TargetLayout: {targetLayout}");
-                Debug.WriteLine($"LastLayout: {lastLoadedLayout}");
-
                 // Only switch if we found a layout AND it's different from what we last loaded
                 if (!string.IsNullOrEmpty(targetLayout) && targetLayout != lastLoadedLayout)
                 {
                     LayoutService.LoadLayout(targetLayout);
                     lastLoadedLayout = targetLayout;
+                    Debug.WriteLine($"Switched to layout: {targetLayout}");
 
                     // Apply variable overrides if any exist for this fingerprint
                     var config = settingsService.GetConfig();
@@ -67,9 +64,6 @@ namespace RainmeterLayoutManager.Services
                         layoutService.ApplyVariableOverrides(targetLayout, fingerprintConfig.VariableOverrides);
                         Debug.WriteLine($"Applied variable overrides for {fingerprintConfig.VariableOverrides.Count} skin(s)");
                     }
-
-                    // Optional: Log this or show a toast notification
-                    Debug.WriteLine($"Switched to layout: {targetLayout}");
                 }
             }
             catch (Exception ex)

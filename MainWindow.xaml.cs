@@ -164,14 +164,7 @@ namespace RainmeterLayoutManager
 
         private void RefreshFingerprint_Click(object sender, RoutedEventArgs e)
         {
-            string fingerprintBefore = FingerprintText.Text;
-            FingerprintText.Text = "Loading...";
-            UpdateFingerprintDisplay();
-            string fingerprintAfter = FingerprintText.Text;
-            if (fingerprintBefore != fingerprintAfter)
-            {
-                autoSwitcherService.CheckAndSwitch();
-            }
+            autoSwitcherService.CheckAndSwitch();
         }
 
         private void AddLayoutBinding_Click(object sender, RoutedEventArgs e)

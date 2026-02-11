@@ -13,7 +13,14 @@ namespace RainmeterLayoutManager.Services
         {
             if (File.Exists(RainmeterPath))
             {
-                Process.Start(RainmeterPath, args);
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = RainmeterPath,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                Process.Start(startInfo);
             }
             else
             {
@@ -356,7 +363,7 @@ namespace RainmeterLayoutManager.Services
             /// </param>
             public static void WriteKeyValue(string filePath, string section, string key, string value)
             {
-                RunRainmeterBang($"!WriteKeyValue {section} {key} \"{value}\", \"{filePath}\"");
+                RunRainmeterBang($"!WriteKeyValue {section} {key} \"{value}\" \"{filePath}\"");
             }
 
             /// <summary>
@@ -580,7 +587,7 @@ namespace RainmeterLayoutManager.Services
             /// <param name="config">(required) Config name.</param>
             public static void Refresh(string config)
             {
-                RunRainmeterBang($"!Refresh\"{config}\"");
+                RunRainmeterBang($"!Refresh \"{config}\"");
             }
 
             /// <summary>Opens the skin context menu.</summary>
