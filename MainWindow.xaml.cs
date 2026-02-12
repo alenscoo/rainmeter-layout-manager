@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -42,13 +43,16 @@ namespace RainmeterLayoutManager
             LoadMappings();
         }
 
-        private static void SetStartup(bool isEnabled)
+        private static bool SetStartup(bool isEnabled)
         {
             const string AppName = "RainmeterLayoutManager";
-            string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string? appPath = Environment.ProcessPath;
+
+            // If we can't get the .exe path, don't set an invalid registry entry
+            if (string.IsNullOrEmpty(appPath)) return false;
 
             RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-            if (key == null) return; // Registry key not accessible, exit gracefully
+            if (key == null) return false; // Registry key not accessible, exit gracefully
 
             if (isEnabled)
             {
@@ -60,6 +64,7 @@ namespace RainmeterLayoutManager
             }
 
             key.Dispose();
+            return true;
         }
 
 
@@ -151,7 +156,16 @@ namespace RainmeterLayoutManager
         {
             bool isChecked = StartWithWindowsCheckBox.IsChecked ?? false;
             settingsService.Config.StartWithWindows = isChecked;
-            SetStartup(isChecked);
+            bool success = SetStartup(isChecked);
+            if (!success)
+            {
+                MessageBox.Show(
+                    "Failed to set startup. Please try again.",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
         }
 
         private void AutoSwitcher_FingerprintDetected(string fingerprint)
